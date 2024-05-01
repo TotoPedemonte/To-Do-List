@@ -1,6 +1,5 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Task from '../components/Task.astro';
 ---
 
 <Layout title="To-Do List">
@@ -12,45 +11,110 @@ import Task from '../components/Task.astro';
 		</span>
 
 		<div class="my-5 w-full h-fit flex justify-between items-center bg-gray-300 rounded-full">
-			<input type="text" name="newTask" class=" w-full h-full text-1xl bg-transparent pl-4 outline-0">
-			<button class="right-0 bg-orange-500 text-white px-6 py-2 rounded-full hover:brightness-105 active:brightness-110">
+			<input id="input-task" type="text" name="newTask" placeholder="Create your Task here" class=" w-full h-full text-1xl bg-transparent pl-4 outline-0">
+			<button onclick="addTask()" class="right-0 bg-orange-500 text-white px-6 py-2 rounded-full hover:brightness-105 active:brightness-110">
 				Add
 			</button>
 		</div>
 
-		<ul class="list-none -mt-5 overflow-scroll max-h-64">
-			<Task />
-
-			<li class="mt-10 flex justify-between items-center">
-				<a href="#" class="flex items-center gap-3 text-gray-600">
-					<img src="../../images/checked.png" alt="Check" class="hidden w-7">
-					<img src="../../images/unchecked.png" alt="Check" class="w-7">
-					<span>Task 1 Test</span>
-				</a>
-				<a href="#">
-					<img src="../../images/x.png" alt="x" class="w-5">
-				</a>
+		<ul class="list-none" id="list-container">
+			<li class="checked">
+				<img class="absolute size-7 top-3 left-2" src="../../images/unchecked.png" alt="o">
+				<p class="text-gray-700">Task 1 Test</p>
 			</li>
-			<li class="mt-10 flex justify-between items-center">
-				<a href="#" class="flex items-center gap-3 text-gray-600">
-					<img src="../../images/checked.png" alt="Check" class="hidden w-7">
-					<img src="../../images/unchecked.png" alt="Check" class="w-7">
-					<span>Task 2 Test</span>
-				</a>
-				<a href="#">
-					<img src="../../images/x.png" alt="x" class="w-5">
-				</a>
+			<li>
+				<img src="../../images/unchecked.png" alt="o">
+				<p class="text-gray-700">Task 2 Test</p>
 			</li>
 		</ul>
 	</main>
 </Layout>
 
-<style>
+<script is:inline>
+	const listContainer = document.getElementById("list-container");
+	const input = document.getElementById("input-task");
+
+	function addTask(){
+		if (input.value === ""){
+			alert("Tenes que escribir algo!");
+		}
+		else {
+			let li = document.createElement("li");
+			let img = document.createElement("img");
+			let close = document.createElement("span");
+			close.innerHTML = "\u00d7";
+			li.innerHTML = input.value;
+
+			input.value = "";
+			listContainer.appendChild(li);
+			li.appendChild(img);
+			li.appendChild(close);
+			saveData();
+		}
+	}
+	listContainer.addEventListener("click", function(e){
+		if(e.target.tagName === "LI"){
+			e.target.classList.toggle("checked");
+			saveData();
+		}
+		else if(e.target.tagName ==="SPAN"){
+			e.target.parentElement.remove();
+			saveData();
+		}
+	}, false)
+	function saveData(){
+		localStorage.setItem("data", listContainer.innerHTML);
+	}
+	function showData(){
+		listContainer.innerHTML = localStorage.getItem("data");
+	}
+	showData();
+</script>
+
+<style is:global>
+	#list-container li span {
+		position: absolute; 
+		right: 0; 
+		top: 4px;
+		width: 40px; 
+		height: 40px;
+		font-size: 24px; 
+		padding-top: 4px;
+		color: #222222; 
+		text-align: center;
+	}
+	#list-container li span:hover {
+		background-color: #b1b1b1;
+		border-radius: 50%;
+	}
+
+	#list-container li{
+		font-size: 1.125rem;
+		line-height: 1.75rem;
+		padding: 0.75rem 0.25rem 0.75rem 3rem;
+		cursor: pointer;
+		position: relative;
+	}
+	#list-container li img {
+		position: absolute;
+		height: 1.75rem;
+		width: 1.75rem;
+		top: 0.75rem;
+		left: 0.5rem;
+		content: url("../../images/unchecked.png");
+	}
 	.text-gradient {
 		background-image: var(--accent-gradient);
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		background-size: 400%;
 		background-position: 0%;
+	}
+	li.checked{
+		color: rgb(107, 114, 128);
+		text-decoration: line-through;
+	}
+	li.checked img{
+		content: url("../../images/checked.png")!important;
 	}
 </style>
